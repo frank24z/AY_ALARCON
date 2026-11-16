@@ -227,13 +227,13 @@
   const P = new URLSearchParams(location.search);
   const START_AT = parseFloat(P.get('t')) || 0;         // solo para pruebas: ?t=45 salta a ese segundo
   const INTRO_MS = P.has('t') ? 600 : 7000;             // solo suenan grillos y sapos
-  const N_FOTOS = 35;
+  const N_FOTOS = 36;
   const FOTOS = Array.from({length:N_FOTOS},(_,i)=>`fotos/${String(i+1).padStart(2,'0')}.jpg`);  // de más pequeña a más grande
 
   // Secciones de la canción (según su intensidad): cuántas fotos entran en cada una
   const SECCIONES = [
-    {de:0,  a:12, n:4},    // inicio suave
-    {de:12, a:40, n:9},    // la música sube
+    {de:0,  a:14, n:4},    // inicio suave
+    {de:14, a:40, n:10},   // la música sube
     {de:40, a:62, n:12},   // clímax: cortes rápidos
     {de:62, a:74, n:6},    // segunda subida
     {de:74, a:89, n:4}     // cierre tranquilo
