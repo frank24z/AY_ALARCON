@@ -110,18 +110,28 @@
 
   /* ---------- Frases: burbujas y palabras grandes que aparecen con la música ---------- */
   #words{position:absolute;inset:0;z-index:7;pointer-events:none}
-  .bub{position:absolute;left:50%;bottom:clamp(86px,16vh,150px);transform:translateX(-50%);max-width:min(86vw,760px);text-align:center;
+  .bub{position:absolute;left:50%;bottom:clamp(86px,16vh,150px);--tx:-50%;--rot:0deg;transform:translateX(var(--tx)) rotate(var(--rot));max-width:min(86vw,760px);text-align:center;
     padding:.55em 1.25em .62em;border-radius:1.4em;font-family:var(--serif);font-style:italic;font-weight:500;font-size:clamp(1.25rem,3.6vw,2.3rem);line-height:1.18;color:#fff;
     background:linear-gradient(135deg,#e2788f,#b94f8c);box-shadow:0 14px 40px rgba(0,0,0,.45);animation:bin .5s cubic-bezier(.2,1.5,.4,1) both;text-shadow:0 1px 8px rgba(0,0,0,.25)}
+  /* posiciones que se alternan para no tapar siempre lo mismo */
+  .bub.pc{left:50%;right:auto;--tx:-50%;--rot:0deg;bottom:clamp(86px,16vh,150px)}
+  .bub.pl{left:5vw;right:auto;--tx:0%;--rot:-2.5deg;bottom:clamp(112px,25vh,240px);text-align:left;max-width:min(76vw,600px)}
+  .bub.pr{left:auto;right:5vw;--tx:0%;--rot:2.5deg;bottom:clamp(96px,19vh,190px);text-align:left;max-width:min(76vw,600px)}
   .bub.gold{background:linear-gradient(135deg,#f2d9a4,#d9a85a);color:#2a1a10;text-shadow:none}
   .bub.blue{background:linear-gradient(135deg,#6aa0ff,#3a62d8)}
   .bub.out{animation:bout .5s ease forwards}
   .bub .w{display:inline-block;opacity:0;transform:translateY(.35em) scale(.7);animation:wpop .45s cubic-bezier(.2,1.6,.4,1) forwards}
-  @keyframes bin{from{opacity:0;transform:translateX(-50%) scale(.6)}to{opacity:1;transform:translateX(-50%) scale(1)}}
-  @keyframes bout{to{opacity:0;transform:translateX(-50%) translateY(-14px) scale(.95)}}
+  .bub .w2{display:inline-block;white-space:nowrap}
+  .bub .w.k{font-size:1.28em;font-weight:600;color:var(--gold);animation-name:kpop;animation-duration:.6s;text-shadow:0 2px 14px rgba(0,0,0,.35)}
+  .bub.gold .w.k{color:#8a2147;text-shadow:none}
+  @keyframes bin{from{opacity:0;transform:translateX(var(--tx)) rotate(var(--rot)) scale(.6)}to{opacity:1;transform:translateX(var(--tx)) rotate(var(--rot)) scale(1)}}
+  @keyframes bout{from{opacity:1;transform:translateX(var(--tx)) rotate(var(--rot))}to{opacity:0;transform:translateX(var(--tx)) translateY(-14px) rotate(var(--rot)) scale(.95)}}
   @keyframes wpop{to{opacity:1;transform:none}}
+  @keyframes kpop{0%{opacity:0;transform:translateY(.4em) scale(.5)}55%{opacity:1;transform:scale(1.4)}100%{opacity:1;transform:none}}
   .big{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;font-family:var(--serif);font-style:italic;font-weight:600;
-    font-size:clamp(3rem,13vw,9.5rem);line-height:1;color:#fff;letter-spacing:.01em;text-shadow:0 6px 40px rgba(0,0,0,.65),0 0 60px rgba(232,200,146,.35);animation:bigin .55s cubic-bezier(.2,1.5,.3,1) both}
+    font-size:clamp(3rem,13vw,9.5rem);line-height:1;color:#fff;letter-spacing:.01em;text-shadow:0 6px 40px rgba(0,0,0,.65),0 0 60px rgba(232,200,146,.35);
+    animation:bigin .55s cubic-bezier(.2,1.5,.3,1) both, trem .13s steps(2,end) .55s infinite alternate}
+  @keyframes trem{from{translate:0 0}to{translate:3px -2px}}
   .big em{color:var(--gold)}
   .big.out{animation:bigout .35s ease forwards}
   @keyframes bigin{from{opacity:0;transform:translateY(-50%) scale(1.7)}to{opacity:1;transform:translateY(-50%) scale(1)}}
@@ -243,7 +253,7 @@
 
   // Frases que acompañan la música. tipo 'b' = burbuja; 'big' = palabras grandes. Son tuyas: edítalas a gusto.
   const FRASES = [
-    {t:0.8,  d:4.2, tipo:'b',   x:'Así empezó todo'},
+    {t:0.8,  d:4.2, tipo:'b',   x:'Así empezó todo', e:1},
     {t:6.2,  d:4.6, tipo:'b',   x:'Pequeña, curiosa, risueña', c:'gold'},
     {t:12.6, d:4.4, tipo:'b',   x:'Cada día aprendías algo nuevo'},
     {t:19.4, d:5.0, tipo:'b',   x:'Y nos enseñaste a mirar el mundo de otra forma', c:'gold'},
@@ -257,8 +267,8 @@
     {t:58.2, d:4.6, tipo:'b',   x:'Orgullosos de ti, siempre', c:'gold'},
     {t:63.4, d:4.4, tipo:'b',   x:'Cada paso te trajo hasta aquí'},
     {t:68.0, d:4.8, tipo:'b',   x:'Sigue brillando', c:'gold'},
-    {t:75.0, d:5.0, tipo:'b',   x:'Esto es solo el comienzo'},
-    {t:81.0, d:5.4, tipo:'b',   x:'Siempre contigo', c:'gold'}
+    {t:75.0, d:5.0, tipo:'b',   x:'Esto es solo el comienzo', e:1},
+    {t:81.0, d:5.4, tipo:'b',   x:'Siempre contigo', c:'gold', e:1}
   ];
   // Letra de la canción (opcional): si pones tus propias líneas en letra.json se muestran con el mismo estilo (ver letra.json)
 
@@ -382,7 +392,7 @@
   /* ===== Escenario ===== */
   const slidesEl=$('#slides'), hud=$('#hud'), fill=$('#fill'), dot=$('#dot'), wordsEl=$('#words'), flash=$('#flash'), player=$('#player'), stageEl=$('#stage');
   const intro=$('#intro'), final=$('#final'), bgv=$('#bgv'), eq=[...document.querySelectorAll('#eq b')];
-  let idx=-1, paused=false, running=false, liveTimer=null, driver=null, vT=0, lastPerf=0, cuts=[], DUR=89, fired=new Set(), lastT=0, letra=[], mainFrases=[];
+  let idx=-1, paused=false, running=false, liveTimer=null, driver=null, vT=0, lastPerf=0, cuts=[], DUR=89, fired=new Set(), lastT=0, letra=[], mainFrases=[], curBub=null, bubN=0;
 
   const track=$('#track');
   for(let i=1;i<N_FOTOS-1;i++){ const m=document.createElement('i'); m.className='mk'; m.style.left=(i/(N_FOTOS-1)*100)+'%'; track.appendChild(m); }
@@ -440,10 +450,45 @@
       }, k*paso));
       return;
     }
-    const e=document.createElement('div'); e.className='bub'+(f.c?' '+f.c:'');
-    e.innerHTML=f.x.split(' ').map((w,k)=>`<span class="w" style="animation-delay:${(.12+k*.14).toFixed(2)}s">${w}</span>`).join(' ');
-    wordsEl.appendChild(e);
-    setTimeout(()=>{ e.classList.add('out'); setTimeout(()=>e.remove(),520); }, Math.max(1200,f.d*1000));
+    const cls='bub '+['pc','pl','pr'][bubN++%3]+(f.c?' '+f.c:'');
+    const todas=[...mainFrases,...letra];
+    const sig=todas.filter(g=>g.tipo==='b'&&g.t>f.t).sort((a,b)=>a.t-b.t)[0];
+    const sostener=!!sig && sig.t-(f.t+f.d)<=2.1;          // si viene otra frase enseguida, esta burbuja se transforma en la siguiente
+    let e=curBub&&curBub.isConnected&&!curBub.classList.contains('out')?curBub:null;
+    if(e){
+      clearTimeout(e._to);
+      const r0=e.getBoundingClientRect();
+      e.className=cls; e.innerHTML=construirFrase(f,.3);
+      const r1=e.getBoundingClientRect();
+      if(!reduce && r1.width && r1.height){
+        e.animate([{translate:`${r0.left-r1.left}px ${r0.top-r1.top}px`,scale:`${r0.width/r1.width} ${r0.height/r1.height}`},{translate:'0 0',scale:'1 1'}],
+                  {duration:700,easing:'cubic-bezier(.3,1.35,.4,1)'});
+      }
+    } else {
+      e=document.createElement('div'); e.className=cls; e.innerHTML=construirFrase(f,0); wordsEl.appendChild(e);
+    }
+    curBub=e;
+    e._to=setTimeout(()=>{ e.classList.add('out'); if(curBub===e) curBub=null; setTimeout(()=>e.remove(),520); }, Math.max(1200,f.d*1000)+(sostener?2300:0));
+  }
+
+  // Arma las palabras de una frase: cada una entra en un golpe de la música; la palabra clave se agranda y se dora
+  function construirFrase(f,extra){
+    const palabras=f.x.split(' ');
+    if(f.e){                                               // efecto "máquina de escribir", letra por letra
+      let d=.15+extra;
+      return palabras.map(w=>`<span class="w2">${[...w].map(ch=>{ const s=`<span class="w" style="animation-delay:${d.toFixed(2)}s">${ch}</span>`; d+=.055; return s; }).join('')}</span>`).join(' ');
+    }
+    const largo=w=>w.replace(/[^\p{L}]/gu,'').length;
+    let kw=0; palabras.forEach((w,i)=>{ if(largo(w)>largo(palabras[kw])) kw=i; });
+    if(palabras.length<2||largo(palabras[kw])<5) kw=-1;
+    const on=ONSETS.filter(o=>o>=f.t+.2&&o<=f.t+f.d*.8);
+    let prev=-1;
+    return palabras.map((w,i)=>{
+      let dl=.14+i*.17;                                    // por defecto, a intervalos parejos
+      if(on.length>=2) dl=on[Math.min(on.length-1,Math.floor(i*on.length/palabras.length))]-f.t;
+      dl=Math.max(dl,prev+.14,.1); prev=dl;
+      return `<span class="w${i===kw?' k':''}" style="animation-delay:${(dl+extra).toFixed(2)}s">${w}</span>`;
+    }).join(' ');
   }
 
   /* ===== Bucle principal sincronizado con la música ===== */
