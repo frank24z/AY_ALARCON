@@ -222,6 +222,7 @@
   <button id="bFull" title="Pantalla completa (F)" aria-label="Pantalla completa">⛶</button>
 </div>
 
+<video id="nosleep" muted loop playsinline tabindex="-1" aria-hidden="true" style="position:fixed;left:0;top:0;width:2px;height:2px;opacity:.01;pointer-events:none"></video>
 <audio id="music" src="audio/musica.mp3" preload="auto"></audio>
 <audio id="amb" src="audio/ambiente.mp3" preload="auto" loop></audio>
 
@@ -540,7 +541,26 @@
     const f=el.requestFullscreen||el.webkitRequestFullscreen||el.msRequestFullscreen;
     if(f){ try{ const r=f.call(el); if(r&&r.catch) r.catch(()=>{}); }catch(e){} }
   }
+  /* ===== Que la pantalla del celular no se apague mientras se ve el homenaje ===== */
+  let wake=null;
+  async function mantenerEncendida(){
+    try{
+      if('wakeLock' in navigator){
+        wake=await navigator.wakeLock.request('screen');
+        wake.addEventListener('release',()=>{ wake=null; });
+        return;
+      }
+    }catch(e){}
+    // Plan B (navegadores sin Wake Lock o con ahorro de batería): un video diminuto y mudo en reproducción mantiene la pantalla activa
+    const v=$('#nosleep'); if(!v.getAttribute('src')) v.src='fondo.mp4';
+    v.play().catch(()=>{});
+  }
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='visible' && document.body.classList.contains('playing') && !wake) mantenerEncendida();
+  });
+
   function start(){
+    mantenerEncendida();
     goFullscreen();
     startAmbient();
     $('#gate').classList.add('hide');
